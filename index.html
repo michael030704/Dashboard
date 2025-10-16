@@ -3,167 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Dashboard Simulator</title>
+    <title>NeoDrive Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            background: linear-gradient(135deg, #0f172a, #1e293b);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
         
         .dashboard-container {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75),
+                        0 0 0 1px rgba(56, 189, 248, 0.2);
             width: 100%;
-            max-width: 800px;
-            padding: 30px;
-            color: white;
-            border: 2px solid #3498db;
+            max-width: 1000px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+        
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8, #0ea5e9);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            position: relative;
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #3498db;
-            text-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin-bottom: 32px;
         }
         
         .dashboard-card {
-            background: rgba(30, 30, 40, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            border: 1px solid #2c3e50;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .card-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #3498db;
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+                        0 10px 10px -5px rgba(56, 189, 248, 0.2);
+        }
+        
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
+            margin-bottom: 24px;
         }
         
-        .card-title i {
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .speed-icon { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .fuel-icon { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .engine-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        
+        .card-title {
             font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
         }
         
         .gauge-container {
             position: relative;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .gauge-base {
+            width: 180px;
             height: 180px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .gauge {
-            width: 150px;
-            height: 150px;
             border-radius: 50%;
-            background: conic-gradient(
-                #2ecc71 0% 30%,
-                #f1c40f 30% 70%,
-                #e74c3c 70% 100%
-            );
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
         
-        .gauge::before {
-            content: "";
+        .gauge-fill {
             position: absolute;
-            width: 130px;
-            height: 130px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: rgba(20, 20, 30, 0.95);
+            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+            transform-origin: center;
+            transform: rotate(-90deg);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
         .gauge-value {
             position: relative;
             z-index: 2;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #f1f5f9, #cbd5e1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .gauge-label {
             position: absolute;
-            bottom: -30px;
+            bottom: -36px;
             left: 50%;
             transform: translateX(-50%);
-            color: #ecf0f1;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
         
         .controls {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
         
         .btn {
-            padding: 12px 15px;
+            padding: 14px 16px;
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 14px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
         .btn-primary {
-            background: #3498db;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
             color: white;
         }
         
         .btn-success {
-            background: #2ecc71;
+            background: linear-gradient(135deg, #10b981, #047857);
             color: white;
         }
         
         .btn-warning {
-            background: #f39c12;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
         }
         
         .btn-danger {
-            background: #e74c3c;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.2);
         }
         
         .btn:active {
@@ -172,92 +236,149 @@
         
         .status-indicators {
             display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
+            justify-content: space-between;
+            margin-top: 28px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
         }
         
         .indicator {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(44, 62, 80, 0.7);
-            min-width: 120px;
+            padding: 18px 24px;
+            border-radius: 18px;
+            background: rgba(30, 41, 59, 0.6);
+            min-width: 140px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
         }
         
         .indicator-value {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin: 8px 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 10px 0;
+            background: linear-gradient(90deg, #f1f5f9, #cbd5e1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .indicator-label {
-            font-size: 0.9rem;
-            color: #bdc3c7;
+            font-size: 0.95rem;
+            color: #94a3b8;
+            font-weight: 600;
         }
         
         .engine-status {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 12px;
+            box-shadow: 0 0 12px currentColor;
         }
         
         .engine-on {
-            background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
+            background: #10b981;
+            color: #10b981;
         }
         
         .engine-off {
-            background: #e74c3c;
+            background: #ef4444;
+            color: #ef4444;
         }
         
         .log-container {
-            background: rgba(20, 20, 30, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 150px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 28px;
+            max-height: 180px;
             overflow-y: auto;
-            border: 1px solid #2c3e50;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
         
         .log-title {
-            color: #3498db;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            color: #38bdf8;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .clear-log {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .clear-log:hover {
+            background: rgba(239, 68, 68, 0.25);
         }
         
         .log-entries {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #ecf0f1;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
         }
         
         .log-entry {
-            padding: 5px 0;
-            border-bottom: 1px solid #34495e;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            gap: 12px;
+        }
+        
+        .log-time {
+            color: #64748b;
+            min-width: 80px;
+        }
+        
+        .log-message {
+            flex: 1;
         }
         
         .log-entry:last-child {
             border-bottom: none;
         }
         
-        @media (max-width: 600px) {
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+        
+        @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
-            .controls {
-                grid-template-columns: 1fr;
+            .status-indicators {
+                flex-direction: column;
+                gap: 16px;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+            
+            .gauge-value {
+                font-size: 2.2rem;
             }
         }
     </style>
@@ -265,66 +386,78 @@
 <body>
     <div class="dashboard-container">
         <header>
-            <h1>Vehicle Dashboard Simulator</h1>
-            <p>By Michael Saragena</p>
+            <h1>NeoDrive Dashboard</h1>
+            <p class="subtitle">Advanced vehicle monitoring system with real-time telemetry and predictive analytics</p>
         </header>
         
         <div class="dashboard-grid">
             <div class="dashboard-card">
-                <h2 class="card-title">
-                    <span>Speed</span>
-                </h2>
+                <div class="card-header">
+                    <div class="card-icon speed-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h2 class="card-title">Speed Control</h2>
+                </div>
                 <div class="gauge-container">
-                    <div class="gauge" id="speedGauge">
+                    <div class="gauge-base">
+                        <div class="gauge-fill" id="speedFill" style="background: conic-gradient(#38bdf8 0%, #38bdf8 0%, transparent 0%);"></div>
                         <div class="gauge-value" id="speedValue">0</div>
                     </div>
                     <div class="gauge-label">km/h</div>
                 </div>
                 <div class="controls">
                     <button class="btn btn-success" id="accelerateBtn">
-                        <span>Accelerate</span>
+                        <i class="fas fa-gas-pedal"></i> Accelerate
                     </button>
                     <button class="btn btn-warning" id="brakeBtn">
-                        <span>Brake</span>
+                        <i class="fas fa-ban"></i> Brake
                     </button>
                 </div>
             </div>
             
             <div class="dashboard-card">
-                <h2 class="card-title">
-                    <span>Fuel Level</span>
-                </h2>
+                <div class="card-header">
+                    <div class="card-icon fuel-icon">
+                        <i class="fas fa-gas-pump"></i>
+                    </div>
+                    <h2 class="card-title">Fuel Management</h2>
+                </div>
                 <div class="gauge-container">
-                    <div class="gauge" id="fuelGauge">
+                    <div class="gauge-base">
+                        <div class="gauge-fill" id="fuelFill" style="background: conic-gradient(#eab308 0%, #eab308 100%, transparent 100%);"></div>
                         <div class="gauge-value" id="fuelValue">100</div>
                     </div>
                     <div class="gauge-label">%</div>
                 </div>
                 <div class="controls">
                     <button class="btn btn-primary" id="refuelBtn">
-                        <span>Refuel</span>
+                        <i class="fas fa-sync-alt"></i> Refuel
                     </button>
                     <button class="btn btn-danger" id="consumeFuelBtn">
-                        <span>Consume Fuel</span>
+                        <i class="fas fa-fire"></i> Consume
                     </button>
                 </div>
             </div>
             
             <div class="dashboard-card">
-                <h2 class="card-title">
-                    <span>Engine</span>
-                </h2>
+                <div class="card-header">
+                    <div class="card-icon engine-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h2 class="card-title">Engine System</h2>
+                </div>
                 <div class="gauge-container">
-                    <div class="gauge" id="engineGauge">
+                    <div class="gauge-base">
+                        <div class="gauge-fill" id="engineFill" style="background: conic-gradient(#ef4444 0%, #ef4444 0%, transparent 0%);"></div>
                         <div class="gauge-value" id="engineStatus">OFF</div>
                     </div>
                 </div>
                 <div class="controls">
                     <button class="btn btn-success" id="startEngineBtn">
-                        <span>Start Engine</span>
+                        <i class="fas fa-power-off"></i> Start
                     </button>
                     <button class="btn btn-danger" id="stopEngineBtn">
-                        <span>Stop Engine</span>
+                        <i class="fas fa-power-off"></i> Stop
                     </button>
                 </div>
             </div>
@@ -332,24 +465,27 @@
         
         <div class="status-indicators">
             <div class="indicator">
-                <div class="indicator-label">Total Distance</div>
-                <div class="indicator-value" id="distanceValue">0 km</div>
+                <div class="indicator-label">TOTAL DISTANCE</div>
+                <div class="indicator-value" id="distanceValue">0.0 km</div>
             </div>
             <div class="indicator">
-                <div class="indicator-label">Fuel Efficiency</div>
-                <div class="indicator-value" id="efficiencyValue">0 km/L</div>
+                <div class="indicator-label">FUEL EFFICIENCY</div>
+                <div class="indicator-value" id="efficiencyValue">0.0 km/L</div>
             </div>
             <div class="indicator">
-                <div class="indicator-label">Engine Status</div>
+                <div class="indicator-label">ENGINE STATUS</div>
                 <div class="indicator-value">
-                    <span class="engine-status engine-off" id="engineIndicator"></span>
-                    <span id="engineStatusText">OFF</span>
+                    <span class="engine-status engine-off pulse" id="engineIndicator"></span>
+                    <span id="engineStatusText">OFFLINE</span>
                 </div>
             </div>
         </div>
         
         <div class="log-container">
-            <h3 class="log-title">Activity Log</h3>
+            <div class="log-header">
+                <h3 class="log-title">System Log</h3>
+                <button class="clear-log" id="clearLogBtn">Clear Log</button>
+            </div>
             <div class="log-entries" id="logEntries"></div>
         </div>
     </div>
@@ -384,7 +520,7 @@
             createSpeedometer() {
                 return {
                     speed: 0,
-                    maxSpeed: 200,
+                    maxSpeed: 220,
                     
                     accelerate(amount) {
                         this.speed = Math.min(this.speed + amount, this.maxSpeed);
@@ -408,7 +544,7 @@
                 return {
                     fuelLevel: 100,
                     maxFuel: 100,
-                    consumptionRate: 0.5, // liters per km
+                    consumptionRate: 0.45, // liters per km
                     
                     consume(distance) {
                         const fuelUsed = distance * this.consumptionRate;
@@ -455,49 +591,42 @@
         // Module Pattern for Dashboard UI
         const DashboardUI = (function() {
             // Private variables
-            let speedValue = document.getElementById('speedValue');
-            let fuelValue = document.getElementById('fuelValue');
-            let engineStatus = document.getElementById('engineStatus');
-            let distanceValue = document.getElementById('distanceValue');
-            let efficiencyValue = document.getElementById('efficiencyValue');
-            let engineIndicator = document.getElementById('engineIndicator');
-            let engineStatusText = document.getElementById('engineStatusText');
-            let logEntries = document.getElementById('logEntries');
+            const speedValue = document.getElementById('speedValue');
+            const fuelValue = document.getElementById('fuelValue');
+            const engineStatus = document.getElementById('engineStatus');
+            const distanceValue = document.getElementById('distanceValue');
+            const efficiencyValue = document.getElementById('efficiencyValue');
+            const engineIndicator = document.getElementById('engineIndicator');
+            const engineStatusText = document.getElementById('engineStatusText');
+            const logEntries = document.getElementById('logEntries');
+            const speedFill = document.getElementById('speedFill');
+            const fuelFill = document.getElementById('fuelFill');
+            const engineFill = document.getElementById('engineFill');
             
             // Private methods
             function updateSpeed(speed) {
-                speedValue.textContent = speed;
-                const percentage = (speed / 200) * 100;
-                document.getElementById('speedGauge').style.background = 
-                    `conic-gradient(
-                        #2ecc71 0% ${Math.min(percentage, 30)}%,
-                        #f1c40f ${Math.min(percentage, 30)}% ${Math.min(percentage, 70)}%,
-                        #e74c3c ${Math.min(percentage, 70)}% ${percentage}%
-                    )`;
+                speedValue.textContent = Math.round(speed);
+                const percentage = (speed / 220) * 100;
+                speedFill.style.background = `conic-gradient(#38bdf8 ${percentage}%, transparent ${percentage}%)`;
             }
             
             function updateFuel(fuel) {
                 fuelValue.textContent = Math.round(fuel);
                 const percentage = fuel;
-                document.getElementById('fuelGauge').style.background = 
-                    `conic-gradient(
-                        #2ecc71 0% ${Math.min(percentage, 30)}%,
-                        #f1c40f ${Math.min(percentage, 30)}% ${Math.min(percentage, 70)}%,
-                        #e74c3c ${Math.min(percentage, 70)}% ${percentage}%
-                    )`;
+                fuelFill.style.background = `conic-gradient(#eab308 ${percentage}%, transparent ${percentage}%)`;
             }
             
             function updateEngine(status) {
-                engineStatus.textContent = status ? 'ON' : 'OFF';
-                engineStatusText.textContent = status ? 'ON' : 'OFF';
-                engineIndicator.className = status ? 'engine-status engine-on' : 'engine-status engine-off';
+                engineStatus.textContent = status ? 'ONLINE' : 'OFFLINE';
+                engineStatusText.textContent = status ? 'ONLINE' : 'OFFLINE';
                 
-                const percentage = status ? 100 : 0;
-                document.getElementById('engineGauge').style.background = 
-                    `conic-gradient(
-                        #2ecc71 0% ${percentage}%,
-                        #34495e ${percentage}% 100%
-                    )`;
+                if (status) {
+                    engineIndicator.className = 'engine-status engine-on';
+                    engineFill.style.background = 'conic-gradient(#10b981 100%, transparent 100%)';
+                } else {
+                    engineIndicator.className = 'engine-status engine-off pulse';
+                    engineFill.style.background = 'conic-gradient(#ef4444 0%, transparent 0%)';
+                }
             }
             
             function updateDistance(distance) {
@@ -509,26 +638,34 @@
             }
             
             function addLogEntry(message) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
                 const entry = document.createElement('div');
                 entry.className = 'log-entry';
-                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                entry.innerHTML = `<span class="log-time">${timeString}</span><span class="log-message">${message}</span>`;
                 logEntries.prepend(entry);
                 
-                // Keep only the last 10 entries
-                if (logEntries.children.length > 10) {
+                // Keep only the last 15 entries
+                if (logEntries.children.length > 15) {
                     logEntries.removeChild(logEntries.lastChild);
                 }
+            }
+            
+            function clearLog() {
+                logEntries.innerHTML = '';
+                addLogEntry('Log cleared by user');
             }
             
             // Public API
             return {
                 init() {
-                    // Initialize UI with default values
                     updateSpeed(0);
                     updateFuel(100);
                     updateEngine(false);
                     updateDistance(0);
                     updateEfficiency(0);
+                    addLogEntry('NeoDrive system initialized');
                 },
                 
                 updateSpeed,
@@ -536,7 +673,8 @@
                 updateEngine,
                 updateDistance,
                 updateEfficiency,
-                addLogEntry
+                addLogEntry,
+                clearLog
             };
         })();
         
@@ -570,11 +708,10 @@
             // Public API
             return {
                 init() {
-                    // Subscribe to events
                     Observer.subscribe('speedChanged', (speed) => {
                         DashboardUI.updateSpeed(speed);
                         if (speed > 0) {
-                            const distance = speed * 0.1; // Simulate distance traveled
+                            const distance = speed * 0.12; // Simulate distance traveled
                             totalDistance += distance;
                             DashboardUI.updateDistance(totalDistance);
                             consumeFuelForDistance(distance);
@@ -585,45 +722,49 @@
                         DashboardUI.updateFuel(fuel);
                         if (fuel <= 0) {
                             engine.stop();
-                            DashboardUI.addLogEntry("Engine stopped: Out of fuel!");
+                            DashboardUI.addLogEntry("⚠️ CRITICAL: Engine shutdown - Fuel depleted!");
+                        } else if (fuel <= 15) {
+                            DashboardUI.addLogEntry("⚠️ LOW FUEL: Reserve level reached");
                         }
                     });
                     
                     Observer.subscribe('engineChanged', (status) => {
                         DashboardUI.updateEngine(status);
-                        DashboardUI.addLogEntry(`Engine ${status ? 'started' : 'stopped'}`);
+                        DashboardUI.addLogEntry(status ? 
+                            "✅ ENGINE: Successfully started" : 
+                            "⏹️ ENGINE: Safely shutdown");
                     });
                 },
                 
                 accelerate(amount) {
                     if (engine.isEngineRunning()) {
                         speedometer.accelerate(amount);
-                        DashboardUI.addLogEntry(`Accelerated by ${amount} km/h`);
+                        DashboardUI.addLogEntry(`🚀 Accelerated by ${amount} km/h`);
                     } else {
-                        DashboardUI.addLogEntry("Cannot accelerate: Engine is off!");
+                        DashboardUI.addLogEntry("❌ ERROR: Cannot accelerate - Engine offline");
                     }
                 },
                 
                 brake(amount) {
                     speedometer.brake(amount);
-                    DashboardUI.addLogEntry(`Braked by ${amount} km/h`);
+                    DashboardUI.addLogEntry(`🛑 Braked by ${amount} km/h`);
                 },
                 
                 refuel(amount) {
                     fuelSystem.refuel(amount);
-                    DashboardUI.addLogEntry(`Refueled by ${amount} liters`);
+                    DashboardUI.addLogEntry(`⛽ Refueled by ${amount} liters`);
                 },
                 
                 consumeFuel(amount) {
                     fuelSystem.consume(amount);
-                    DashboardUI.addLogEntry(`Manually consumed ${amount} liters of fuel`);
+                    DashboardUI.addLogEntry(`🔥 Manually consumed ${amount} liters of fuel`);
                 },
                 
                 startEngine() {
                     if (fuelSystem.getFuelLevel() > 0) {
                         engine.start();
                     } else {
-                        DashboardUI.addLogEntry("Cannot start engine: No fuel!");
+                        DashboardUI.addLogEntry("❌ ERROR: Cannot start engine - No fuel available");
                     }
                 },
                 
@@ -654,19 +795,19 @@
             
             // Event listeners for buttons
             document.getElementById('accelerateBtn').addEventListener('click', () => {
-                Vehicle.accelerate(10);
+                Vehicle.accelerate(12);
             });
             
             document.getElementById('brakeBtn').addEventListener('click', () => {
-                Vehicle.brake(15);
+                Vehicle.brake(18);
             });
             
             document.getElementById('refuelBtn').addEventListener('click', () => {
-                Vehicle.refuel(20);
+                Vehicle.refuel(25);
             });
             
             document.getElementById('consumeFuelBtn').addEventListener('click', () => {
-                Vehicle.consumeFuel(10);
+                Vehicle.consumeFuel(12);
             });
             
             document.getElementById('startEngineBtn').addEventListener('click', () => {
@@ -677,8 +818,9 @@
                 Vehicle.stopEngine();
             });
             
-            // Add initial log entry
-            DashboardUI.addLogEntry("Vehicle dashboard initialized");
+            document.getElementById('clearLogBtn').addEventListener('click', () => {
+                DashboardUI.clearLog();
+            });
         });
     </script>
 </body>
